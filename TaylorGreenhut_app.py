@@ -64,24 +64,14 @@ def tobs():
 
 # Route 5
 @app.route("/api/v1.0/<start>")
-def start():
-    start_date = dt.datetime.strptime(start, '%Y-%m-%d')
-    year_from_sd = dt.timedelta(days=365)
-    begin = start_date - year_from_sd
-    start_data = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs),\
-        func.max(Measurement.tobs))\
-        .filter(Measurement.date >= start_date).all()
-    trip_data = list(np.ravel(start_data))
-    return jsonify(trip_data)
-
-# Route 6
 @app.route("/api/v1.0/<start>/<end>")
-def startend():
-    start_date = dt.datetime.strptime(start, '%Y-%m-%d')
-    end_date = dt.datetime.strptime(end, '%Y-%m-%d')
-    startend_data = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs),\
-        func.max(Measurement.tobs))\
-            .filter(Measurement.date >= start_date).filter(Measurement.date <= end_date).all()
+def info():
+    sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
+    if not end:
+        data2 = session.query(*sel).filter(Measurement.date >= start).all()
+        temp_data = list(np.ravel(data2))
+    data3 = session.query(*sel).filter(Measurement.date >= start).filter(Measurement.date <= end).all()
+    temp_data2 = list(np.ravel(data3))
 
 # Close our session
 session.close()
